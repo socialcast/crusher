@@ -15,11 +15,6 @@ class WebUser < LoadGenerator
     @messageIds = {}
   end
   
-  def login
-    request :post, "#{@uri_root}/sessions", {'email' => @email, 'password' => @password} do |result, duration|
-      log "POST loging in as #{@email}:#{@password} #{result} in #{duration}s"
-    end
-  end
   
   def prepare
     login
@@ -44,21 +39,29 @@ class WebUser < LoadGenerator
     @ready = true
   end
   
+  def login
+    request :post, "#{@uri_root}/sessions", {'email' => @email, 'password' => @password} do |result, duration|
+      log "POST loging in as #{@email}:#{@password} #{result} in #{duration}s"
+    end
+  end  
+  
   def get_messages
 
     result = request :get, "#{@uri_root}/api/messages.json" do |result, duration|
       log "GET message list #{result} in #{duration}s"
     end
     
-    messages = Crack::JSON.parse(result.content)['messages']
-    @messageIds = {}
-    messages.each do |message|
-      @messageIds[message['id'].to_i] = message
+    if result
+      messages = Crack::JSON.parse(result.content)['messages']
+      @messageIds = {}
+      messages.each do |message|
+        @messageIds[message['id'].to_i] = message
+      end
     end
+    
   end
   
   def post_message
-    
     request :post, "#{@uri_root}/api/messages.json", {'message[body]' => Util.lipsum([5, rand(50)].max)} do |result, duration|
       log "POST message #{result} in #{duration}s"
     end
