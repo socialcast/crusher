@@ -1,9 +1,6 @@
 #!/usr/bin/env ruby
-require 'rubygems'
-require 'lib/load_generator'
-require 'lib/web_user'
-require 'lib/util'
-
+$LOAD_PATH.unshift File.join( File.dirname(__FILE__) + "/../lib" )
+require 'crusher'
 
 options = {
   :target_url => ARGV[0],
@@ -18,7 +15,7 @@ puts "Initializing #{options[:concurrent_users]} processes..."
 options[:concurrent_users].times do |i|
   fork do
     
-    WebUser.new(options[:target_url], 
+    Crusher::WebUser.new(options[:target_url], 
       'emily@socialcast.com', 'demo', 
       options.merge!(:process_name => "WebUser #{i}")
     ).start!
