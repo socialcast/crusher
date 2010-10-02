@@ -14,6 +14,7 @@ end_time = Time.now + 60 * options[:duration_in_minutes]
 puts "Initializing #{options[:concurrent_users]} processes..."
 options[:concurrent_users].times do |i|
   fork do
+    Kernel.srand(Process.pid)
     user = WebUser.new(options[:target_url], 'emily@socialcast.com', 'demo')
     
     while Time.now < end_time
