@@ -30,9 +30,9 @@ module Crusher
       case rand(10)
       when 0..2  
         get_messages
-      when 3..6
+      when 3
         post_message
-      when 7..9
+      when 4..9
         post_comment
       end
       sleep rand(4)
