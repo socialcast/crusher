@@ -32,8 +32,10 @@ module Crusher
         get_messages
       when 3
         post_message
-      when 4..9
+      when 4..7
         post_comment
+      when 8..9
+        post_like
       end
       sleep rand(4)
       @ready = true
@@ -71,6 +73,13 @@ module Crusher
       id = @messageIds.keys[rand(@messageIds.keys.size)]
       request :post, "#{@uri_root}/api/messages/#{id}/comments", {'comment[comment]' => Util.lipsum([5, rand(25)].max)} do |result, duration|
         log "POST comment #{result} in #{duration}s"
+      end
+    end
+    
+    def post_like
+      id = @messageIds.keys[rand(@messageIds.keys.size)]
+      request :post, "#{@uri_root}/api/messages/#{id}/likes" do |result, duration|
+        log "POST like #{result} in #{duration}s"
       end
     end
   
