@@ -6,7 +6,7 @@ options = {
   :target_url => ARGV[0],
   :concurrent_users => ARGV[1].to_i,
   :duration_in_minutes => ARGV[2].to_i,
-  :log_file => 'log/crusher.log'
+  :log_file => ARGV[3]
 }
 
 options[:end_time] = Time.now + 60 * options[:duration_in_minutes]
