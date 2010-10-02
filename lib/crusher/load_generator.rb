@@ -4,7 +4,11 @@ module Crusher
   
     def initialize(options)
       @options = options
-      @log_file = File.open(options[:log_file], 'a') if options[:log_file]
+      begin
+        @log_file = File.open(options[:log_file], 'a') if options[:log_file] 
+      rescue Errno::ENOENT
+        log("Log file #{options[:log_file]} couldn't be opened; logging to STDOUT")
+      end
     
       # Reseed the pseudorandom number generator with the process's PID file,
       # as we assume this code will be run in a forked process.
