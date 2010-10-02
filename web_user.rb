@@ -12,7 +12,7 @@ class WebUser
     @uri_root = uri_root
     @email = email
     @password = password
-    @client = HTTPClient.new @uri_root
+    @client = HTTPClient.new
     cookie_store = "#{Process.pid}-cookie-#{id}.dat"
     @client.set_cookie_store cookie_store
     @messageIds = {}
