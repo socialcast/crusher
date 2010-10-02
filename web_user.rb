@@ -1,7 +1,7 @@
-require 'rubygems'
 gem 'httpclient'
 gem 'crack'
 require 'crack/json'
+require "httpclient"
 
 class WebUser
   
@@ -11,13 +11,15 @@ class WebUser
     @email = email
     @password = password
     @client = HTTPClient.new @uri_root
-    @client.set_cookie_store "cookie-#{id}.dat"
+    cookie_store = "#{Process.pid}-cookie-#{id}.dat"
+    @client.set_cookie_store cookie_store
     @messageIds = {}
     login
     get_messages
   end
   
   def login
+    puts "logging in #{@email} #{password}"
     @client.post "#{@uri_root}/sso/login", {'email' => @email, 'password' => @password}
   end
   
@@ -40,6 +42,7 @@ class WebUser
   end
   
   def get_messages
+    puts "getting messages"
     @client.get_content "#{@uri_root}/api/messages.json" do |content|
       messages = Crack::JSON.parse(content)
       messages.each do |message|
@@ -49,12 +52,14 @@ class WebUser
   end
   
   def post_message
-    @client.post "#{@uri_root}/api/messages.json", {'message': {'body': ('A' * rand(50))}}
+    puts "posting message"
+    @client.post "#{@uri_root}/api/messages.json", {'message' => {'body' => ('A' * rand(50))}}
   end
   
   def post_comment
+    puts "posting comment"
     id = @messageIds.keys[rand(@messageIds.keys.size)]
-    @client.post "#{@uri_root}/api/messages/#{id}/comments", {'comment':{'comment':('B'*rand(30))}}
+    @client.post "#{@uri_root}/api/messages/#{id}/comments", {'comment' => {'comment' => ('B'*rand(30))}}
   end
   
 end

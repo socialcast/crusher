@@ -1,5 +1,24 @@
 #!/usr/bin/env ruby
-
+require 'rubygems'
 require 'web_user'
 
 
+options = {
+  :target_url => ARGV[0],
+  :concurrent_users => ARGV[1].to_i,
+  :duration_in_minutes => ARGV[2].to_i,
+}
+
+end_time = Time.now + 60 * options[:duration_in_minutes]
+
+puts "Initializing #{options[:concurrent_users]} processes..."
+options[:concurrent_users].times do |i|
+  fork do
+    user = WebUser.new(options[:target_url], 'emily@socialcast.com', 'demo')
+    
+    while Time.now < end_time
+      user.act!
+    end
+    
+  end
+end
