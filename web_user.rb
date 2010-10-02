@@ -19,7 +19,7 @@ class WebUser
   end
   
   def login
-    puts "logging in #{@email} #{password}"
+    puts "logging in #{@email} #{@password}"
     @client.post "#{@uri_root}/sso/login", {'email' => @email, 'password' => @password}
   end
   
