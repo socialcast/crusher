@@ -1,25 +1,27 @@
 #!/usr/bin/env ruby
 require 'rubygems'
-require 'web_user'
+require 'lib/load_generator'
+require 'lib/web_user'
+require 'lib/util'
 
 
 options = {
   :target_url => ARGV[0],
   :concurrent_users => ARGV[1].to_i,
   :duration_in_minutes => ARGV[2].to_i,
+  :log_file => 'log/crusher.log'
 }
 
-end_time = Time.now + 60 * options[:duration_in_minutes]
+options[:end_time] = Time.now + 60 * options[:duration_in_minutes]
 
 puts "Initializing #{options[:concurrent_users]} processes..."
 options[:concurrent_users].times do |i|
   fork do
-    Kernel.srand(Process.pid)
-    user = WebUser.new(options[:target_url], 'emily@socialcast.com', 'demo')
     
-    while Time.now < end_time
-      user.act!
-    end
+    WebUser.new(options[:target_url], 
+      'emily@socialcast.com', 'demo', 
+      options.merge!(:process_name => "WebUser #{i}")
+    ).start!
     
   end
 end
