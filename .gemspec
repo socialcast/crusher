@@ -5,6 +5,8 @@ spec = Gem::Specification.new do |s|
   s.description = 'A scriptable, multiprocessing load generator designed to bring web applications to their knees'
   s.homepage = 'http://github.com/phene/crusher'
   
+  s.add_dependency('httpclient')
+  
   s.authors = ['phene', 'thatothermitch']
   
   s.files = Dir['rails/init.rb', 'lib/**/*', 'bin/*', 'test/**/*',
