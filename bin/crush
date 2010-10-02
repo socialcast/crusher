@@ -2,23 +2,34 @@
 $LOAD_PATH.unshift File.join( File.dirname(__FILE__) + "/../lib" )
 require 'crusher'
 
-options = {
-  :target_url => ARGV[0],
-  :concurrent_users => ARGV[1].to_i,
-  :duration_in_minutes => ARGV[2].to_i,
-  :log_file => ARGV[3]
-}
+config = Crusher::Configurator::Configuration.new('.crusher')
 
-options[:end_time] = Time.now + 60 * options[:duration_in_minutes]
+target_name = ARGV[0].to_sym
+scenario_name = ARGV[1].to_sym
 
-puts "Initializing #{options[:concurrent_users]} processes..."
-options[:concurrent_users].times do |i|
-  fork do
-    
-    Crusher::WebUser.new(options[:target_url], 
-      'emily@socialcast.com', 'demo', 
-      options.merge!(:process_name => "WebUser #{i}")
-    ).start!
-    
+target = config.targets[target_name]
+scenario = config.scenarios[scenario_name]
+
+puts "Fatal Error: Unknown target '#{target_name}'" unless target
+puts "Fatal Error: Unknown scenario '#{scenario_name}'" unless scenario 
+exit(1) unless target && scenario
+
+options = {}
+options[:end_time] = Time.now + scenario.duration
+options[:log_file] = ARGV[2]
+
+scenario.launch_jobs.each do |job|
+  job_id = 0
+  puts "Launching #{job[:count]} #{job[:type]}(s)..."
+  
+  job[:count].times do
+    fork do
+      options[:process_name] = "#{job[:type]} #{job_id}"
+      job[:proc].call(target, scenario, options, job_id)
+      exit(0)
+    end
+    job_id += 1
   end
+  
 end
+
