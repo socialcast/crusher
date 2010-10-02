@@ -33,9 +33,9 @@ class WebUser
     case rand(10)
     when 0..2  
       get_messages
-    when 3..6
+    when 3..4
       post_message
-    when 7..9
+    when 5..9
       post_comment
     end
     sleep rand(4)
@@ -46,7 +46,6 @@ class WebUser
     result = @client.get "#{@uri_root}/api/messages.json"
     messages = Crack::JSON.parse(result.content)['messages']
     messages.each do |message|
-      puts message.inspect
       @messageIds[message['id'].to_i] = message
     end
   end
