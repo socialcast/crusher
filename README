@@ -1,0 +1,26 @@
+== .crush DSL
+
+  target :test do
+    uri 'http://www.test.com'
+  end
+  
+  scenario :normal do
+  
+    duration 300 # seconds
+    
+    launch 5, 'test.com-user' do |target, scenario, options, job_id| do
+      WebUser.new(...).start!
+    end
+    
+    launch 1, 'test.com-admin' do |target, scenario, options, job_id| do
+      WebUser.new(...).start!
+    end
+  
+  end
+
+== crush executable
+
+Reads .crush in CWD for targets and scenarios, invoke like this:
+
+  crush target_name scenario_name [log_file]
+
