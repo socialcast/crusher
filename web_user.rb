@@ -19,8 +19,7 @@ class WebUser
   end
   
   def login
-    puts "logging in #{@email} #{@password}"
-    @client.post "#{@uri_root}/sso/login", {'email' => @email, 'password' => @password}
+    @client.post "#{@uri_root}/sessions", {'email' => @email, 'password' => @password}
   end
   
   def ready?
@@ -42,24 +41,21 @@ class WebUser
   end
   
   def get_messages
-    puts "getting messages"
-    @client.get_content "#{@uri_root}/api/messages.json" do |content|
-      messages = Crack::JSON.parse(content)
-      messages.each do |message|
-        @messageIds[message['id'].to_i] = message
-      end
+    result = @client.get "#{@uri_root}/api/messages.json"
+    messages = Crack::JSON.parse(result.content)['messages']
+    messages.each do |message|
+      puts message.inspect
+      @messageIds[message['id'].to_i] = message
     end
   end
   
   def post_message
-    puts "posting message"
-    @client.post "#{@uri_root}/api/messages.json", {'message' => {'body' => ('A' * rand(50))}}
+    @client.post "#{@uri_root}/api/messages.json", {'message[body]' => ('A' * rand(50))}
   end
   
   def post_comment
-    puts "posting comment"
     id = @messageIds.keys[rand(@messageIds.keys.size)]
-    @client.post "#{@uri_root}/api/messages/#{id}/comments", {'comment' => {'comment' => ('B'*rand(30))}}
+    @client.post "#{@uri_root}/api/messages/#{id}/comments", {'comment[comment]' => ('B'*rand(30))}
   end
   
 end
