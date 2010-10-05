@@ -7,29 +7,73 @@ config = Crusher::Configurator::Configuration.new('.crusher')
 target_name = ARGV[0].to_sym
 scenario_name = ARGV[1].to_sym
 
-target = config.targets[target_name]
-scenario = config.scenarios[scenario_name]
+@target = config.targets[target_name]
+@scenario = config.scenarios[scenario_name]
 
-puts "Fatal Error: Unknown target '#{target_name}'" unless target
-puts "Fatal Error: Unknown scenario '#{scenario_name}'" unless scenario 
-exit(1) unless target && scenario
 
-options = {}
-options[:end_time] = Time.now + scenario.duration
-options[:log_file] = ARGV[2]
 
-scenario.launch_jobs.each do |job|
-  job_id = 0
-  puts "Launching #{job[:count]} #{job[:type]}(s)..."
-  
-  job[:count].times do
-    fork do
-      options[:process_name] = "#{job[:type]} #{job_id}"
-      job[:proc].call(target, scenario, options, job_id)
-      exit(0)
-    end
-    job_id += 1
-  end
-  
+puts "Fatal Error: Unknown target '#{target_name}'" unless @target
+puts "Fatal Error: Unknown scenario '#{scenario_name}'" unless @scenario 
+exit(1) unless @target && @scenario
+
+
+SPIN_UP_PER_JOB = 0.5
+@total_launch_jobs = @scenario.launch_jobs.inject(0) {|memo, job| memo + job[:count]}
+@spin_up_time = (SPIN_UP_PER_JOB * @total_launch_jobs).to_i
+
+@options = {}
+@options[:end_time] = Time.now + @scenario.duration + @spin_up_time
+@options[:log_file] = ARGV[2]
+
+
+puts "Allocating #{@spin_up_time} to spin up #{@total_launch_jobs} jobs."
+
+@queued_jobs = []
+
+def queue_job(job, id)
+  @queued_jobs <<  [job, id]
+  launch_queued_jobs if @queued_jobs.length >= 20
 end
 
+
+def launch_queued_jobs
+  return nil if @queued_jobs.length == 0
+    
+  fork do
+    
+    # Reseed the pseudorandom number generator with the process's PID file,
+    # as we assume this code will be run in a forked process.
+    Kernel.srand(Process.pid)
+    
+    last_thread = nil
+    
+    puts "Forked process to host #{@queued_jobs.length} job(s)..."
+    @queued_jobs.each do |settings|
+      last_thread = Thread.new do
+        job, job_id = settings
+        options = @options.merge(:process_name => "#{job[:type]} #{job_id}")
+        sleep(rand(@spin_up_time))
+        job[:proc].call(@target, @scenario, options, job_id)
+      end
+    end
+    
+    last_thread.join
+    
+  end
+  
+  @queued_jobs = []
+  
+  nil
+end
+
+@scenario.launch_jobs.each do |job|
+  job_id = 0
+  puts job.keys.inspect
+  puts "Launching #{job[:count]} #{job[:type]}(s)..."
+  job[:count].times do
+    queue_job(job, job_id)
+    job_id += 1
+  end
+end
+
+launch_queued_jobs
