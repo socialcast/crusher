@@ -17,13 +17,17 @@ puts "Fatal Error: Unknown scenario '#{scenario_name}'" unless @scenario
 exit(1) unless @target && @scenario
 
 
-SPIN_UP_PER_JOB = 0.5
+SPIN_UP_PER_JOB = 0.3
 @total_launch_jobs = @scenario.launch_jobs.inject(0) {|memo, job| memo + job[:count]}
 @spin_up_time = (SPIN_UP_PER_JOB * @total_launch_jobs).to_i
 
 @options = {}
-@options[:end_time] = Time.now + @scenario.duration + @spin_up_time
+@options[:post_spinup_margin] = 60.0 
+@options[:start_time] = Time.now + @spin_up_time + @options[:post_spinup_margin]
+@options[:start_up_jitter] = 10
+@options[:end_time] = @options[:start_time] + @scenario.duration
 @options[:log_file] = ARGV[2]
+
 
 
 puts "Allocating #{@spin_up_time} to spin up #{@total_launch_jobs} jobs."

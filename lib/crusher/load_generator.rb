@@ -12,12 +12,16 @@ module Crusher
     end
   
     def start!
-      log('Booting')
+      log('Preparing...')
       prepare
+      wait_time = [(@options[:start_time] - Time.now), 0].max + rand(@options[:start_up_jitter]
+      log("Waiting #{wait_time} to begin load generation...")
+      sleep(wait_time)
+      log('Starting...')
       while running?
         act!
       end
-      log('Terminating')
+      log('Finished')
     end
   
     def act!; end
