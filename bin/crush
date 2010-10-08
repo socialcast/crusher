@@ -22,7 +22,7 @@ SPIN_UP_PER_JOB = 0.3
 @spin_up_time = (SPIN_UP_PER_JOB * @total_launch_jobs).to_i
 
 @options = {}
-@options[:post_spinup_margin] = 60.0 
+@options[:post_spinup_margin] = 0
 @options[:start_time] = Time.now + @spin_up_time + @options[:post_spinup_margin]
 @options[:start_up_jitter] = 10
 @options[:end_time] = @options[:start_time] + @scenario.duration
@@ -30,13 +30,14 @@ SPIN_UP_PER_JOB = 0.3
 
 
 
-puts "Allocating #{@spin_up_time} to spin up #{@total_launch_jobs} jobs."
+puts "Allocating #{@spin_up_time} to spin up #{@total_launch_jobs} jobs, and #{@options[:post_spinup_margin]} for server to cool"
+puts "Test will begin around #{@options[:start_time]}"
 
 @queued_jobs = []
 
 def queue_job(job, id)
   @queued_jobs <<  [job, id]
-  launch_queued_jobs if @queued_jobs.length >= 20
+  launch_queued_jobs if @queued_jobs.length >= 50
 end
 
 
@@ -50,8 +51,6 @@ def launch_queued_jobs
     Kernel.srand(Process.pid)
     
     last_thread = nil
-    
-    puts "Forked process to host #{@queued_jobs.length} job(s)..."
     @queued_jobs.each do |settings|
       last_thread = Thread.new do
         job, job_id = settings
