@@ -23,8 +23,8 @@ module Crusher
     
     class Target
       
-      def initialize(&block)
-        instance_eval &block
+      def initialize(*args, &block)
+        block.call self, *args
       end      
       
       def uri(new_uri = nil)
@@ -38,10 +38,10 @@ module Crusher
       
       attr_reader :launch_jobs
       
-      def initialize(&block)
+      def initialize(*args, &block)
         @launch_jobs = []
         @duration = nil
-        instance_eval &block
+        block.call self, *args
       end
       
       def launch(count, type, &block)
