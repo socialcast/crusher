@@ -6,6 +6,7 @@ spec = Gem::Specification.new do |s|
   s.homepage = 'http://github.com/phene/crusher'
   
   s.add_dependency('httpclient')
+  s.add_dependency('eventmachine')
   
   s.authors = ['phene', 'thatothermitch']
   
