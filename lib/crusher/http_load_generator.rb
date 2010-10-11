@@ -12,37 +12,36 @@ module Crusher
 
       uri = URI.parse(path)
 
-      post_args = content.keys.map do |key| 
-        content[key] ? "#{URI.escape(key)}=#{URI.escape(content[key])}" : nil
+      http_args = content.keys.map do |key| 
+        content[key] ? "#{URI.escape(key.to_s)}=#{URI.escape(content[key].to_s)}" : nil
       end
 
-      post_args = post_args.compact.join("&")
+      
+
+      qs, content = if method == :get
+        [((uri.query || '').split('&') + http_args.compact).join("&"), nil]
+      else
+        [uri.query, http_args.join("&")] 
+      end
 
       options = {
         :verb => method,
         :host => uri.host,
         :port => uri.port,
         :request => uri.path,
-        :query_string => uri.query,
-        :content => post_args,
+        :query_string => qs,
+        :content => content,
         :contenttype => 'application/x-www-form-urlencoded',
         :cookie => @cookies.find(uri)
       }
-
-      puts options.inspect
 
       start_time = Time.now
       EM::Protocols::HttpClient.request(options).callback do |response|
         duration = Time.now - start_time
         
         response[:headers].each do |header|
-          
           matcher = /Set-Cookie:\s*(.*)/i.match(header)
-          
-          if matcher
-            puts "Found cookie-like header: #{header}"
-            @cookies.parse(matcher[1], uri)
-          end
+          @cookies.parse(matcher[1], uri) if matcher
         end
         
         block.call(response, duration) if block
