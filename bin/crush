@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.unshift File.join( File.dirname(__FILE__) + "/../lib" )
 require 'crusher'
-require 'eventmachine'
+require 'thatothermitch-eventmachine'
 
 config = Crusher::Configurator::Configuration.new('Crushfile')
 
@@ -38,7 +38,7 @@ puts "Test will begin around #{@options[:start_time]}"
 
 def queue_job(job, id)
   @queued_jobs <<  [job, id]
-  launch_queued_jobs if @queued_jobs.length >= 50
+  # launch_queued_jobs if @queued_jobs.length >= 50
 end
 
 
@@ -55,7 +55,6 @@ def launch_queued_jobs
       @queued_jobs.each do |settings|
         job, job_id = settings
         options = @options.merge(:process_name => "#{job[:type]} #{job_id}")
-        sleep(rand(@spin_up_time))
         job[:proc].call(@target, @scenario, options, job_id)
       end
     end

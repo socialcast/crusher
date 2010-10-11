@@ -32,9 +32,10 @@ module Crusher
         :query_string => qs,
         :content => content,
         :contenttype => 'application/x-www-form-urlencoded',
-        :cookie => @cookies.find(uri)
+        :cookie => @cookies.find(uri),
+        :ssl => (uri.scheme == "https" ? true : false)
       }
-
+      
       start_time = Time.now
       EM::Protocols::HttpClient.request(options).callback do |response|
         duration = Time.now - start_time
