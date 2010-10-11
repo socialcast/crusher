@@ -10,20 +10,7 @@ module Crusher
         log("Log file #{options[:log_file]} couldn't be opened; logging to STDOUT")
       end    
     end
-  
-    def start!
-      log('Preparing...')
-      prepare
-      wait_time = [(@options[:start_time] - Time.now), 0].max + rand(@options[:start_up_jitter])
-      log("Waiting #{wait_time} to begin load generation...")
-      sleep(wait_time)
-      log('Starting...')
-      while running?
-        act!
-      end
-      log('Finished')
-    end
-  
+    
     def act!; end
   
     def prepare; end

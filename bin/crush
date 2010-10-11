@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.unshift File.join( File.dirname(__FILE__) + "/../lib" )
 require 'crusher'
+require 'eventmachine'
 
 config = Crusher::Configurator::Configuration.new('Crushfile')
 
@@ -50,17 +51,14 @@ def launch_queued_jobs
     # as we assume this code will be run in a forked process.
     Kernel.srand(Process.pid)
     
-    last_thread = nil
-    @queued_jobs.each do |settings|
-      last_thread = Thread.new do
+    EM.run do
+      @queued_jobs.each do |settings|
         job, job_id = settings
         options = @options.merge(:process_name => "#{job[:type]} #{job_id}")
         sleep(rand(@spin_up_time))
         job[:proc].call(@target, @scenario, options, job_id)
       end
     end
-    
-    last_thread.join
     
   end
   
