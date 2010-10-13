@@ -50,7 +50,7 @@ Here's an annotated example:
 
 # crush command
 
-Reads the Crushfile in the CWD for targets and scenarios, -invoke- unleash like this:
+Reads the Crushfile in the CWD for targets and scenarios, <strike>invoke</strike> unleash like this:
 
 <code>
     $ crush _target\_name_ _scenario\_name_ _[log\_file]_
