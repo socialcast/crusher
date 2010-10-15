@@ -2,6 +2,7 @@
 $LOAD_PATH.unshift File.join( File.dirname(__FILE__) + "/../lib" )
 require 'crusher'
 require 'eventmachine'
+require 'activesupport'
 
 config = Crusher::Configurator::Configuration.new('Crushfile')
 
@@ -16,6 +17,8 @@ scenario_name = ARGV[1].to_sym
 puts "Fatal Error: Unknown target '#{target_name}'" unless @target
 puts "Fatal Error: Unknown scenario '#{scenario_name}'" unless @scenario 
 exit(1) unless @target && @scenario
+
+puts @scenario.phases.inspect
 
 
 SPIN_UP_PER_JOB = 0.3
@@ -41,11 +44,40 @@ def queue_job(job, id)
   # launch_queued_jobs if @queued_jobs.length >= 50
 end
 
+def run_next_phase
+  return if @scenario.phases.length == 0
+  
+  next_phase = @scenario.phases.shift
+  
+  if next_phase[:wait]
+    EM::Timer.new(next_phase[:wait].to_i) do
+      run_next_phase
+    end
+  elsif next_phase[:over]
+    seconds_per_job = next_phase[:over].to_f / @running_jobs.count.to_f
+    next_job = 0
+    
+    slow_iterator = EM::PeriodicTimer.new(seconds_per_job) do
+      next_phase[:proc].call(@running_jobs[next_job])
+      next_job += 1
+      
+      if next_job >= @running_jobs.length
+        slow_iterator.cancel
+        run_next_phase
+      end
+    end
+  end
+  
+end
+
 
 def launch_queued_jobs
   return nil if @queued_jobs.length == 0
     
   fork do
+    
+    
+    @running_jobs = []
     
     # Reseed the pseudorandom number generator with the process's PID file,
     # as we assume this code will be run in a forked process.
@@ -55,8 +87,11 @@ def launch_queued_jobs
       @queued_jobs.each do |settings|
         job, job_id = settings
         options = @options.merge(:process_name => "#{job[:type]} #{job_id}")
-        job[:proc].call(@target, @scenario, options, job_id)
+        @running_jobs << job[:proc].call(@target, @scenario, options, job_id)
       end
+      
+      run_next_phase
+      
     end
     
   end

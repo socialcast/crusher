@@ -36,10 +36,11 @@ module Crusher
     
     class Scenario
       
-      attr_reader :launch_jobs
+      attr_reader :launch_jobs, :phases
       
       def initialize(*args, &block)
         @launch_jobs = []
+        @phases = []
         @duration = nil
         block.call self, *args
       end
@@ -48,6 +49,10 @@ module Crusher
         @launch_jobs.push :type => type, :count => count, :proc => block
       end
       
+      def phase(name, options = {}, &block)
+        @phases << options.merge( :name => name.to_s, :proc => block )
+      end
+
       def duration(new_duration = nil)
         return @duration unless new_duration
         @duration = new_duration
