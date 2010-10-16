@@ -3,8 +3,8 @@ module Crusher
   class HttpLoadGenerator < LoadGenerator
     
     
-    def initialize(options)
-      super(options)
+    def initialize(crush_session, options)
+      super(crush_session, options)
       @cookies = ::WebAgent::CookieManager.new 
     end
     
@@ -15,9 +15,7 @@ module Crusher
       http_args = content.keys.map do |key| 
         content[key] ? "#{URI.escape(key.to_s)}=#{URI.escape(content[key].to_s)}" : nil
       end
-
       
-
       qs, content = if method == :get
         [((uri.query || '').split('&') + http_args.compact).join("&"), nil]
       else

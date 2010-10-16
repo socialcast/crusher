@@ -2,7 +2,8 @@ module Crusher
   
   class LoadGenerator
   
-    def initialize(options)
+    def initialize(crush_session, options)
+      @crush_session = crush_session
       @options = options
       begin
         @log_file = File.open(options[:log_file], 'a') if options[:log_file] 
@@ -14,19 +15,9 @@ module Crusher
     def act!; end
   
     def prepare; end
-    
-    def running?
-      Time.now < @options[:end_time]
-    end
-  
+        
     def log(message)
-      log_message = Time.now.strftime('%Y-%m-%d %H:%M:%S') + ' ' + @options[:process_name] + ' ' +  message + "\n"
-      if @log_file
-        @log_file.syswrite(log_message)
-      else
-        puts log_message
-      end
-      nil
+      @crush_session.log(message)
     end
   
   end
