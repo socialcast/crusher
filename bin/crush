@@ -2,7 +2,7 @@
 $LOAD_PATH.unshift File.join( File.dirname(__FILE__) + "/../lib" )
 require 'crusher'
 require 'eventmachine'
-require 'activesupport'
+require 'active_support/core_ext'
 
 config = Crusher::Configurator::Configuration.new('Crushfile')
 
