@@ -42,7 +42,7 @@ module Crusher
     end
 
     def run_next_phase
-      return if @scenario.phases.length == 0
+      shutdown if @scenario.phases.length == 0
 
       next_phase = @scenario.phases.shift
       @current_phase = next_phase[:name].to_s
@@ -96,5 +96,9 @@ module Crusher
       nil
     end
     
+  end
+  
+  def shutdown
+    EM.stop_reactor_loop
   end
 end
