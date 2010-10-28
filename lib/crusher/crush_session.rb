@@ -42,30 +42,31 @@ module Crusher
     end
 
     def run_next_phase
-      shutdown if @scenario.phases.length == 0
+      if @scenario.phases.length == 0
+        shutdown 
+      else
+        next_phase = @scenario.phases.shift
+        @current_phase = next_phase[:name].to_s
 
-      next_phase = @scenario.phases.shift
-      @current_phase = next_phase[:name].to_s
-
-      if next_phase[:wait]
-        EM::Timer.new(next_phase[:wait].to_i) do
-          run_next_phase
-        end
-      elsif next_phase[:over]
-        seconds_per_job = next_phase[:over].to_f / @running_jobs.count.to_f
-        next_job = 0
-
-        slow_iterator = EM::PeriodicTimer.new(seconds_per_job) do
-          next_phase[:proc].call(@running_jobs[next_job])
-          next_job += 1
-
-          if next_job >= @running_jobs.length
-            slow_iterator.cancel
+        if next_phase[:wait]
+          EM::Timer.new(next_phase[:wait].to_i) do
             run_next_phase
+          end
+        elsif next_phase[:over]
+          seconds_per_job = next_phase[:over].to_f / @running_jobs.count.to_f
+          next_job = 0
+
+          slow_iterator = EM::PeriodicTimer.new(seconds_per_job) do
+            next_phase[:proc].call(@running_jobs[next_job])
+            next_job += 1
+
+            if next_job >= @running_jobs.length
+              slow_iterator.cancel
+              run_next_phase
+            end
           end
         end
       end
-
     end
 
 
@@ -97,7 +98,7 @@ module Crusher
     end
     
     def shutdown
-      EM.stop_reactor_loop
+      EM::stop_event_loop
     end
     
   end
