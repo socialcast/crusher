@@ -96,9 +96,10 @@ module Crusher
       nil
     end
     
+    def shutdown
+      EM.stop_reactor_loop
+    end
+    
   end
   
-  def shutdown
-    EM.stop_reactor_loop
-  end
 end
