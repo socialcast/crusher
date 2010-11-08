@@ -3,10 +3,10 @@ spec = Gem::Specification.new do |s|
   s.version = '0.0.1'
   s.summary = 'A scriptable load generator'
   s.description = 'A scriptable, multiprocessing load generator designed to bring web applications to their knees'
-  s.homepage = 'http://github.com/phene/crusher'
+  s.homepage = 'http://github.com/socialcast/crusher'
   
   s.add_dependency('httpclient')
-  s.add_dependency('eventmachine')
+  s.add_dependency('crusher-eventmachine')
   
   s.authors = ['phene', 'thatothermitch']
   
