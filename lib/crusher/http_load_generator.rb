@@ -36,7 +36,7 @@ module Crusher
       
       start_time = Time.now
       EM::Protocols::HttpClient.request(options).callback do |response|
-        duration = Time.now - start_time
+        duration = ((Time.now - start_time) * 1000).to_i
         
         response[:headers].each do |header|
           matcher = /Set-Cookie:\s*(.*)/i.match(header)

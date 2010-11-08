@@ -35,8 +35,7 @@ module Crusher
       nil
     end
     
-    private 
-    
+  private 
     def queue_job(job, id)
       @queued_jobs << [job, id]
     end
