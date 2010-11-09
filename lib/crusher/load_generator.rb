@@ -5,6 +5,9 @@ module Crusher
     def initialize(crush_session, options)
       @crush_session = crush_session
       @options = options
+      
+      Dir.mkdir @options[:stats_log_dir] if @options[:stats_log_dir] && !File.exist?(@options[:stats_log_dir])
+      
       begin
         @log_file = File.open(options[:log_file], 'a') if options[:log_file] 
       rescue Errno::ENOENT

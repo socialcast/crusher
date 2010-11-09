@@ -5,6 +5,13 @@ module Crusher::Util
     (1..6).map{ rand(min,max) }.sum / 6
   end
 
+  # http://en.wikipedia.org/wiki/Poisson_distribution
+  def self.prand(lamb, min, max)
+    l, k, p = [(2.718 ** (-lamb)), 1, rand]
+    k += 1 and p *= rand while p > l
+    ((k * (max - min)) + min).to_i
+  end
+
   def self.lipsum(words)
     (1..words).map{ DUMMY_WORDS[ rand(DUMMY_WORDS.length) ] }.join(' ')
   end
