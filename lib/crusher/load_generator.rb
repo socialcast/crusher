@@ -25,15 +25,17 @@ module Crusher
     
     def log_stats(event_type, data)
       keys, values = data.map{|k,v| [k.to_s,v.to_s] }.transpose
-      stats_log_file(event_type).syswrite "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')},#{values.join(',')}\n"
+      stats_log_file(event_type) do |file|
+        file.syswrite "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')},#{values.join(',')}\n"
+      end
     end
     
     def stats_log_file(event_type)
       event_type = event_type.to_sym
-      @stats_logs ||= {}
-      @stats_logs[event_type] ||= File.open(File.join(@options[:stats_log_dir], "#{event_type}.csv"), 'a')
-    end
-  
+      File.open(File.join(@options[:stats_log_dir], "#{event_type}.csv"), 'a') do |file|
+        yield file
+      end
+    end  
   end
   
 end
