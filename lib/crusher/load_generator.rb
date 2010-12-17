@@ -7,12 +7,7 @@ module Crusher
       @options = options
       
       Dir.mkdir @options[:stats_log_dir] if @options[:stats_log_dir] && !File.exist?(@options[:stats_log_dir])
-      
-      begin
-        @log_file = File.open(options[:log_file], 'a') if options[:log_file] 
-      rescue Errno::ENOENT
-        log("Log file #{options[:log_file]} couldn't be opened; logging to STDOUT")
-      end    
+
     end
     
     def act!; end
@@ -27,6 +22,7 @@ module Crusher
       keys, values = data.map{|k,v| [k.to_s,v.to_s] }.transpose
       stats_log_file(event_type) do |file|
         file.syswrite "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')},#{values.join(',')}\n"
+        file.flush unless file.fsync
       end
     end
     
