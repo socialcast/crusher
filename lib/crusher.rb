@@ -1,3 +1,4 @@
+require 'logger'
 require 'rubygems'
 require 'crusher/crush_session'
 require 'crusher/load_generator'
