@@ -35,6 +35,13 @@ module Crusher
       }
       
       start_time = Time.now
+      em_request(start_time, options)
+
+    end
+    
+    private
+    
+    def em_request(start_time, options, times_to_retry=3)
       EM::Protocols::HttpClient.request(options).callback do |response|
         duration = ((Time.now - start_time) * 1000).to_i
         
@@ -44,11 +51,12 @@ module Crusher
         end
         
         block.call(response, duration) if block
+      end.errback do |deferred_args|
+        unless times_to_retry <= 0
+          em_request(start_time, options, (times_to_retry - 1))
+        end
       end
-
     end
-    
-    
   end
   
 end
