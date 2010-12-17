@@ -1,6 +1,6 @@
 spec = Gem::Specification.new do |s|
   s.name = 'crusher'
-  s.version = '0.0.7'
+  s.version = '0.0.8'
   s.summary = 'A scriptable load generator'
   s.description = 'A scriptable, multiprocessing load generator designed to bring web applications to their knees'
   s.homepage = 'http://github.com/socialcast/crusher'
