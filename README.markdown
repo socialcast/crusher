@@ -53,7 +53,7 @@ Here's an annotated example:
 Reads the Crushfile in the CWD for targets and scenarios, <strike>invoke</strike> unleash like this:
 
 <code>
-    $ crush target\_name scenario\_name [log\_file]
+    $ crush target_name scenario_name [log_file]
 </code>
 
 # Eventmachine dependency
