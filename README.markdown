@@ -1,3 +1,33 @@
+# Agent Framework
+Use the Crusher::HttpLoadGenerator as a base class for defining new load generators:
+<code>
+  
+      class WebUser < Crusher::HttpLoadGenerator
+
+        def initialize(crush_session, email, password, options)
+          super(crush_session, options)
+        end
+
+        def prepare!
+          # Do any preparatory work before beginning the test
+          log "Prepared!"
+        end
+
+        def start!
+          # Do any work required when this agent has been commanded 
+          # to start generating load
+          log "Starting!"
+        end
+
+        def act!
+          # Called ~ once per second during the test
+          request(:get, "www.google.com"){|response, duration| log("RECIEVED: #{response[:status]}")} if rand < .01
+        end
+  
+      end
+</code>
+
+
 # Crushfile DSL
 
 The Crushfile provides a ruby DSL for configuring Crusher with targets and load generation scenarios.
