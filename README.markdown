@@ -59,3 +59,7 @@ Reads the Crushfile in the CWD for targets and scenarios, <strike>invoke</strike
 # Eventmachine dependency
 
 Crusher currently requires a non-standard version of the eventmachine gem.  See http://github.com/socialcast/eventmachine for now.
+
+# Copyright
+
+Copyright (c) 2011 Socialcast, Inc. See LICENSE for details.
