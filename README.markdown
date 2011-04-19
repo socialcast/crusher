@@ -95,6 +95,12 @@ A pull request has been submitted: https://github.com/eventmachine/eventmachine/
 
 In the meantime, check out "crusher-eventmachine" here: http://github.com/socialcast/eventmachine
 
+# Authors
+
+Geoffrey Hichborn (phene)
+Mitch Williams (thatothermitch)
+Sean Cashin (scashin133)
+
 # Copyright
 
 Copyright (c) 2011 Socialcast, Inc. See LICENSE for details.
