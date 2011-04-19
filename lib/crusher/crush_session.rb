@@ -1,7 +1,7 @@
 module Crusher
   class CrushSession
     
-    attr_reader :target, :scenario, :log_file
+    attr_reader :target, :scenario, :logger
     
     def initialize(target, scenario, options = {})
       @target = target
@@ -26,12 +26,8 @@ module Crusher
     end
     
     def log(message)
-      log_message = Time.now.strftime('%Y-%m-%d %H:%M:%S') + ' ' + @current_phase + ' ' +  message + "\n"
-      if @log_file
-        @log_file.syswrite(log_message)
-      else
-        puts log_message
-      end
+      log_message = @current_phase + ' ' +  message
+      @logger.info log_message
       nil
     end
     
@@ -73,8 +69,11 @@ module Crusher
       return nil if @queued_jobs.length == 0
 
       fork do
-        
-        @log_file = File.open(@options.delete(:log_file), 'a') if @options[:log_file]
+        log_output = @options[:log_file] ? @options.delete(:log_file) : STDOUT
+        @logger = Logger.new(log_output, File::APPEND)
+        formatter = Logger::Formatter.new
+        formatter.datetime_format = "%Y-%m-%d %H:%M:%S"
+        @logger.formatter = formatter
         
         # Reseed the pseudorandom number generator with the process's PID file, otherwise
         # we'll inherit our sequence of random numbers from the parent process
@@ -92,7 +91,6 @@ module Crusher
       end
 
       @queued_jobs = []
-
       nil
     end
     

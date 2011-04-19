@@ -1,3 +1,33 @@
+# Agent Framework
+Use the Crusher::HttpLoadGenerator as a base class for defining new load generators:
+<code>
+  
+      class WebUser < Crusher::HttpLoadGenerator
+
+        def initialize(crush_session, email, password, options)
+          super(crush_session, options)
+        end
+
+        def prepare!
+          # Do any preparatory work before beginning the test
+          log "Prepared!"
+        end
+
+        def start!
+          # Do any work required when this agent has been commanded 
+          # to start generating load
+          log "Starting!"
+        end
+
+        def act!
+          # Called ~ once per second during the test
+          request(:get, "www.google.com"){|response, duration| log("RECIEVED: #{response[:status]}")} if rand < .01
+        end
+  
+      end
+</code>
+
+
 # Crushfile DSL
 
 The Crushfile provides a ruby DSL for configuring Crusher with targets and load generation scenarios.
@@ -53,12 +83,17 @@ Here's an annotated example:
 Reads the Crushfile in the CWD for targets and scenarios, <strike>invoke</strike> unleash like this:
 
 <code>
-    $ crush _target\_name_ _scenario\_name_ _[log\_file]_
+    $ crush target_name scenario_name [log_file]
 </code>
 
 # Eventmachine dependency
 
-Crusher currently requires a non-standard version of the eventmachine gem.  See http://github.com/socialcast/eventmachine for now.
+
+Crusher currently requires a non-standard version of the eventmachine gem, as it depends on features which are not currently available in http://github.com/eventmachine/eventmachine
+
+A pull request has been submitted: https://github.com/eventmachine/eventmachine/pull/173
+
+In the meantime, check out "crusher-eventmachine" here: http://github.com/socialcast/eventmachine
 
 # Copyright
 

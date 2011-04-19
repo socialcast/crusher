@@ -35,7 +35,24 @@ module Crusher
       }
       
       start_time = Time.now
-      EM::Protocols::HttpClient.request(options).callback do |response|
+      em_request(start_time, uri, block, options)
+
+    end
+    
+    private
+    
+    def em_request(start_time, uri, block, options, times_to_retry=1)
+      begin
+        http = EM::Protocols::HttpClient.request(options)
+      rescue EventMachine::ConnectionError => error
+        unless times_to_retry > 3
+          @crush_session.logger.warn "retrying for #{times_to_retry} time with error \"#{error}\" failed request #{options.inspect}"
+          em_request(start_time, uri, block, options, (times_to_retry + 1))
+        end
+        @crush_session.logger.error "Failed after 3 tries with error \"#{error}\": #{options.inspect}"
+        raise error
+      end
+      http.callback do |response|
         duration = ((Time.now - start_time) * 1000).to_i
         
         response[:headers].each do |header|
@@ -45,10 +62,7 @@ module Crusher
         
         block.call(response, duration) if block
       end
-
     end
-    
-    
   end
   
 end
