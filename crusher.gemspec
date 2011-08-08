@@ -9,7 +9,7 @@ spec = Gem::Specification.new do |s|
   s.add_dependency('crusher-eventmachine')
   
   s.authors = ['Geoffrey Hichborn', 'Mitch Williams', 'Sean Cashin']
-  s.emails =  ["geoff@socialcast.com", "mitch@socialcast.com", "sean@socialcast.com"]
+  s.email =  ["geoff@socialcast.com", "mitch@socialcast.com", "sean@socialcast.com"]
   
   s.files = Dir['rails/init.rb', 'lib/**/*', 'bin/*', 'test/**/*',
       'extra/**/*', 'Rakefile', 'init.rb', '.yardopts']
