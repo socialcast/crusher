@@ -8,12 +8,12 @@ module Crusher
       @cookies = ::WebAgent::CookieManager.new 
     end
     
-    def request(method, path, content = {}, &block)
+    def request(method, path, content = {}, custom_headers = {}, &block)
 
       uri = URI.parse(path)
 
       http_args = content.keys.map do |key| 
-        content[key] ? "#{URI.escape(key.to_s)}=#{URI.escape(content[key].to_s)}" : nil
+        content[key] ? "#{CGI.escape(key.to_s)}=#{CGI.escape(content[key].to_s)}" : nil
       end
       
       qs, content = if method == :get
@@ -29,6 +29,7 @@ module Crusher
         :request => uri.path,
         :query_string => qs,
         :content => content,
+        :custom_headers => custom_headers,
         :contenttype => 'application/x-www-form-urlencoded',
         :cookie => @cookies.find(uri),
         :ssl => (uri.scheme == "https" ? true : false)
