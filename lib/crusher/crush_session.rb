@@ -70,7 +70,7 @@ module Crusher
 
       fork do
         log_output = @options[:log_file] ? @options.delete(:log_file) : STDOUT
-        @logger = Logger.new(log_output, File::APPEND)
+        @logger = Logger.new(log_output)
         formatter = Logger::Formatter.new
         formatter.datetime_format = "%Y-%m-%d %H:%M:%S"
         @logger.formatter = formatter
