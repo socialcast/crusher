@@ -3,11 +3,11 @@ $LOAD_PATH.unshift File.join( File.dirname(__FILE__) + "/../lib" )
 require 'crusher'
 require 'eventmachine'
 require 'active_support/core_ext'
-
+require 'cgi'
 config = Crusher::Configurator::Configuration.new('Crushfile')
 
-target_name = ARGV[0].to_sym
-scenario_name = ARGV[1].to_sym
+target_name = ARGV[0].to_s.to_sym
+scenario_name = ARGV[1].to_s.to_sym
 
 target = config.targets[target_name]
 scenario = config.scenarios[scenario_name]
@@ -20,3 +20,4 @@ options = {}
 options[:log_file] = ARGV[2]
 
 Crusher::CrushSession.new(target, scenario, options)
+Process.wait
